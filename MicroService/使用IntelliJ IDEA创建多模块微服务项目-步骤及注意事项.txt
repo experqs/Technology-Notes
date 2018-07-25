@@ -1,0 +1,73 @@
+
+使用IntelliJ IDEA创建多模块的Spring项目，每个模块可以单独打包成jar文件并独立运行，实现分布式微服务化架构。
+
+创建步骤：
+1、New Project -> 创建新项目（下面也称为父模块）
+2、New Module -> 创建这个项目的子项目/子模块
+
+
+
+------------------父子模块常用的创建方式------------------
+
+在“New Project”或“New Module”界面上通常可以选择两种方式：Maven 或 Spring Initializr
+因此有下面的选择：
+
+
+1、父子模块均使用 Maven 创建：在项目各模块的结构上比较智能化，但需要手动编辑pom文件引入Spring相关依赖、手动创建Spring程序入口SpringBootApplication、手动新建配置文件application.properties、手动创建测试类等。
+
+2、父子模块均使用 Spring Initializr 创建：可以界面上按需选择Spring相关依赖（如SpringBoot、SpringCloud各组件），创建后的pom.xml自动导入这些依赖，但父子模块并没有形成继承关系，需要手动编辑父模块pom文件的<packaging>、<modules>和子模块中的<parent>结构。
+
+（子模块配置<parent>之后，可以按需清理其它与父模块重复的节点，如<properties>、<build>、<dependency>等）
+
+3、（较佳）父模块使用 Spring Initializr 创建，子模块使用 Maven 创建（子模块创建后，会自动修改父模块的<packaging>、<modules>）（但仍然需要手动创建Spring程序入口、配置文件、测试类）。
+
+4、（一般不使用）父模块使用 Maven 创建，子模块使用 Spring Initializr 创建。
+
+
+（IntelliJ IDEA 2017.1.5 版本，使用Spring Initializr创建模块，指定模块版本号但无效，创建后的pom.xml还是显示0.0.1-SNAPSHOT）
+
+
+------------------创建后注意事项------------------
+
+1、父模块的pom文件的packaging，一般应设置为 <packaging>pom</packaging>
+  （使得在父模块执行mvn package操作时，不会把父模块也打包成.jar文件）
+  子模块的packaging可无需另外设置，默认为jar。
+
+2、创建父模块后，如果无需使用父模块的src文件夹的话也可以将其删掉。
+
+
+------------------附：使用Maven创建项目/模块时的智能化体现------------------
+
+使用Maven创建父模块后，父模块的pom文件为：
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.mvn</groupId>
+    <artifactId>mainroot</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+
+然后在项目上右键选择新建模块，使用Maven方式创建的新模块的pom文件为（自动引入了<parent>）：
+
+    <parent>
+        <artifactId>mainroot</artifactId>
+        <groupId>com.mvn</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>son1</artifactId>
+
+
+同时，父模块的pom文件已自动变成（自动设置了<packaging>为pom，并引入了<modules>）：
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.mvn</groupId>
+    <artifactId>mainroot</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>son1</module>
+    </modules>
+
